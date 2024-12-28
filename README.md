@@ -1,9 +1,7 @@
 # VM Instance Group protected by IAP and Workforce Identity Federation
 
 
-## Overall architecture
 
-![](imgs/2.png)
 
 
 ## Setup
