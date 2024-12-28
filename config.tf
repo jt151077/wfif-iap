@@ -22,6 +22,7 @@ locals {
   organization_nmr        = var.organization_nmr
   oidc_client_id          = var.oidc_client_id
   oidc_client_secret      = var.oidc_client_secret
+  issuer_uri              = var.issuer_uri
 
   gcp_service_list = [
     "iam.googleapis.com",

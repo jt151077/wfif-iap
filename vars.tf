@@ -29,3 +29,7 @@ variable "oidc_client_secret" {
 variable "oidc_client_id" {
   type = string
 }
+
+variable "issuer_uri" {
+  type = string
+}

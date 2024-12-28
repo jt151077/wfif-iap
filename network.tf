@@ -128,6 +128,7 @@ resource "google_compute_url_map" "default" {
   default_service = google_compute_backend_service.iap-instance-backend-srv.self_link
 }
 
+
 resource "google_compute_url_map" "https_redirect" {
   project = var.project_id
   name    = "${var.project_id}-https-redirect"
@@ -140,19 +141,22 @@ resource "google_compute_url_map" "https_redirect" {
 }
 
 resource "google_compute_global_forwarding_rule" "http" {
-  project    = var.project_id
-  name       = "${var.project_id}-http"
-  target     = google_compute_target_http_proxy.default.self_link
-  ip_address = google_compute_global_address.default.address
-  port_range = "80"
+  project               = var.project_id
+  name                  = "${var.project_id}-http"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
+  target                = google_compute_target_http_proxy.default.self_link
+  ip_address            = google_compute_global_address.default.address
+  port_range            = "80"
 }
 
+
 resource "google_compute_global_forwarding_rule" "https" {
-  project    = var.project_id
-  name       = "${var.project_id}-https"
-  target     = google_compute_target_https_proxy.default.self_link
-  ip_address = google_compute_global_address.default.address
-  port_range = "443"
+  project               = var.project_id
+  name                  = "${var.project_id}-https"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
+  target                = google_compute_target_https_proxy.default.self_link
+  ip_address            = google_compute_global_address.default.address
+  port_range            = "443"
 }
 
 resource "google_compute_global_address" "default" {
@@ -168,14 +172,6 @@ resource "google_iap_brand" "project_brand" {
   project           = var.project_nmr
 }
 
-/*resource "google_iap_client" "project_client" {
-  depends_on = [
-    google_iap_brand.project_brand
-  ]
-  display_name = "LB Client"
-  brand        = google_iap_brand.project_brand.name
-}*/
-
 
 resource "google_iap_web_backend_service_iam_binding" "iap-backend-binding" {
   depends_on = [
@@ -185,7 +181,7 @@ resource "google_iap_web_backend_service_iam_binding" "iap-backend-binding" {
   web_backend_service = google_compute_backend_service.iap-instance-backend-srv.name
   role                = "roles/iap.httpsResourceAccessor"
   members = [
-    "principalSet://iam.googleapis.com/locations/global/workforcePools/wfif-test-pool/*",
+    "principalSet://iam.googleapis.com/${google_iam_workforce_pool.wfif-pool.id}/*",
   ]
 }
 

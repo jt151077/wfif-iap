@@ -107,6 +107,10 @@ resource "google_compute_region_instance_group_manager" "iap-instance-group" {
 
 
 resource "google_compute_backend_service" "iap-instance-backend-srv" {
+  depends_on = [google_compute_region_instance_group_manager.iap-instance-group,
+    google_compute_instance_template.iap_instance_template
+  ]
+
   project = var.project_id
   name    = "iap-instance-backend-srv"
 

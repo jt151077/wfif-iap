@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-resource "google_iam_workforce_pool" "wfif-test-pool" {
-  display_name      = "wfif-test-pool"
-  workforce_pool_id = "wfif-test-pool"
+
+resource "random_string" "random_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+}
+
+
+resource "google_iam_workforce_pool" "wfif-pool" {
+  display_name      = "${random_string.random_suffix.result}-wfif-pool"
+  workforce_pool_id = "${random_string.random_suffix.result}-wfif-pool"
   parent            = "organizations/${local.organization_nmr}"
   location          = "global"
 }
 
-resource "google_iam_workforce_pool_provider" "azure-ad-oidc-provider" {
-  workforce_pool_id = google_iam_workforce_pool.wfif-test-pool.workforce_pool_id
-  location          = google_iam_workforce_pool.wfif-test-pool.location
-  provider_id       = "azure-ad-oidc-provider"
-  display_name      = "azure-ad-oidc-provider"
+resource "google_iam_workforce_pool_provider" "oidc-provider" {
+  workforce_pool_id = google_iam_workforce_pool.wfif-pool.workforce_pool_id
+  location          = google_iam_workforce_pool.wfif-pool.location
+  provider_id       = "${random_string.random_suffix.result}-oidc-provider"
+  display_name      = "${random_string.random_suffix.result}-oidc-provider"
 
   attribute_mapping = {
     "google.subject"      = "assertion.sub"
@@ -34,7 +42,7 @@ resource "google_iam_workforce_pool_provider" "azure-ad-oidc-provider" {
   }
 
   oidc {
-    issuer_uri = "https://login.microsoftonline.com/8048ab41-d5f5-4fc5-8cf3-5f61d491d264/v2.0"
+    issuer_uri = local.issuer_uri
     client_id  = local.oidc_client_id
 
     client_secret {
@@ -50,3 +58,6 @@ resource "google_iam_workforce_pool_provider" "azure-ad-oidc-provider" {
   }
 }
 
+output "workforce_pool_id" {
+  value = google_iam_workforce_pool.wfif-pool.id
+}
