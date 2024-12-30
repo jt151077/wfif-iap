@@ -1,7 +1,8 @@
 # VM Instance Group protected by IAP and Workforce Identity Federation
 
+## Overall architecture
 
-
+![](imgs/0.png)
 
 
 ## Setup
@@ -21,6 +22,7 @@
     "issuer_uri": "YOUR_OIDC_CLIENT_ISSUER_URI"
 }
 ```
+
 
 ## Install
 
