@@ -145,7 +145,7 @@ resource "google_compute_global_forwarding_rule" "http" {
   name                  = "${var.project_id}-http"
   load_balancing_scheme = "EXTERNAL_MANAGED"
   target                = google_compute_target_http_proxy.default.self_link
-  ip_address            = google_compute_global_address.default.address
+  ip_address            = data.google_compute_global_address.default.address
   port_range            = "80"
 }
 
@@ -155,16 +155,14 @@ resource "google_compute_global_forwarding_rule" "https" {
   name                  = "${var.project_id}-https"
   load_balancing_scheme = "EXTERNAL_MANAGED"
   target                = google_compute_target_https_proxy.default.self_link
-  ip_address            = google_compute_global_address.default.address
+  ip_address            = data.google_compute_global_address.default.address
   port_range            = "443"
 }
 
-resource "google_compute_global_address" "default" {
-  project    = var.project_id
-  name       = "${var.project_id}-address"
-  ip_version = "IPV4"
+data "google_compute_global_address" "default" {
+  project = var.project_id
+  name    = var.project_id
 }
-
 
 resource "google_iap_brand" "project_brand" {
   support_email     = var.iap_brand_support_email
@@ -185,9 +183,7 @@ resource "google_iap_web_backend_service_iam_binding" "iap-backend-binding" {
   ]
 }
 
-
 output "lb_external_ip" {
-  value = google_compute_global_address.default.address
+  value = data.google_compute_global_address.default.address
 }
-
 

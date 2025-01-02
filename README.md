@@ -38,6 +38,8 @@ $ terraform apply
 
 2. Update the domain so that it points to the `lb_external_ip` address, which is output by terraform. Keep also the value of `workforce_pool_id` from the output for later use.
 
+> Note: In this example, the public IP is set upon project creation, with the same name as the `project_id`. This is why it is "retrieved" using the `data` resource.
+
 3. In the console, under Security => Identity-Aware Proxy, enable the IAP on the backend service by clicking on the toggle button. After a few minutes, the status should be "OK" 
 
 4. Open a Cloud Shell on the same project and run the following commands:
