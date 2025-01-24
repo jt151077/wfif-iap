@@ -1,7 +1,0 @@
-access_settings:
-  identity_sources: ["WORKFORCE_IDENTITY_FEDERATION"]
-  workforce_identity_settings:
-    workforce_pools: ["locations/global/workforcePools/x19ipzej-wfif-pool"]
-    oauth2:
-      client_id: "a4b70f4ab-34f9-41f4-863a-7a863536a460"
-      client_secret: "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5f8e756279f78c160f152de623b7f95f321a"
