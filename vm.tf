@@ -78,6 +78,55 @@ echo "Hello world from $(hostname) $(hostname -i)" > /var/www/html/index.html
 
 }
 
+resource "google_compute_instance_template" "iap_instance_template_no_metadata" {
+  project = local.project_id
+  name    = "iap-instance-template-no-metadata"
+  region  = local.project_default_region
+
+  machine_type = "e2-medium"
+
+  network_interface {
+    subnetwork = google_compute_subnetwork.custom-subnet.id
+    stack_type = "IPV4_ONLY"
+
+    access_config {
+      // Ephemeral public IP
+    }
+  }
+
+  disk {
+    auto_delete  = true
+    boot         = true
+    disk_size_gb = 10
+    disk_type    = "pd-balanced"
+    type         = "PERSISTENT"
+    source_image = "projects/debian-cloud/global/images/debian-12-bookworm-v20241210"
+  }
+
+  scheduling {
+    automatic_restart   = true
+    on_host_maintenance = "MIGRATE"
+    preemptible         = false
+    provisioning_model  = "STANDARD"
+  }
+
+    metadata = {
+    startup-script = <<-EOT
+#!/bin/bash
+apt update
+apt -y install nginx
+    EOT
+  }
+
+  tags = ["http-server"]
+
+  reservation_affinity {
+    type = "ANY_RESERVATION"
+  }
+
+
+}
+
 
 resource "google_compute_region_instance_group_manager" "iap-instance-group" {
 
@@ -88,10 +137,11 @@ resource "google_compute_region_instance_group_manager" "iap-instance-group" {
   region                    = local.project_default_region
   distribution_policy_zones = data.google_compute_zones.available.names
 
-  target_size = 2
+  target_size = 1
 
   version {
-    instance_template = google_compute_instance_template.iap_instance_template.self_link_unique
+    instance_template = google_compute_instance_template.iap_instance_template_no_metadata.self_link_unique
+    #instance_template = google_compute_instance_template.iap_instance_template.self_link_unique
   }
 
   auto_healing_policies {
@@ -108,7 +158,9 @@ resource "google_compute_region_instance_group_manager" "iap-instance-group" {
 
 resource "google_compute_backend_service" "iap-instance-backend-srv" {
   depends_on = [google_compute_region_instance_group_manager.iap-instance-group,
-    google_compute_instance_template.iap_instance_template
+    google_compute_instance_template.iap_instance_template_no_metadata,
+    google_compute_instance_template.iap_instance_template,
+    google_iap_brand.project_brand
   ]
 
   project = var.project_id
